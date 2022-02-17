@@ -20,6 +20,9 @@
 # RStudio files
 .Rproj.user/
 
+# Intellij files
+.idea/
+
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
@@ -39,3 +42,5 @@ vignettes/*.pdf
 .Renviron
 
 opencage_api.rds
+
+twitter_bearer_token.rds

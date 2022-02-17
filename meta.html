@@ -9,15 +9,20 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="">
 <meta name="og:image" content="">
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
 <style>
 html, body {
     width:100%;
     height:100%; 
-    font-family: 
-    Oswald, sans-serif;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif
 }
 
-h2 {
+#brand h2 {
+    color: white;
+    text-shadow: 1px 1px rgba(0,0,0,0.5);
+    font-size: 35px;
+    font-weight: 500;
     color: white;
 }
 
@@ -30,8 +35,111 @@ h2 {
 	background-color: rgba(255, 255, 255, 0.2);
 }
 
+.vis-dot {
+    background: url("twitter-icon.svg") no-repeat;
+    border: none !important;
+    border-radius: 100px !important;
+    width: 30px !important;
+    height: 30px !important;
+    margin-left: -15px !important;
+    margin-top: 3px !important;
+    box-shadow: 3px 2px 3px rgb(100 100 100 / 33%) !important;
+}
+
+
+.vis-item.vis-point.vis-selected {
+    background-color: transparent !important;
+}
+
+.vis-item.vis-selected {
+    border-color: transparent !important;
+    background-color: transparent !important;
+}
+
+.vis-cluster {
+    background-color: #2daae1 !important;
+    width: max-content !important;
+    border-radius: 100px !important;
+    height: 30px !important;
+    margin-top: 12px;
+    box-shadow: 3px 2px 3px rgb(100 100 100 / 33%) !important;
+}
+
+.vis-cluster.vis-selected {
+    background-color: #2daae1 !important;
+}
+
+.vis-cluster .vis-item-content div {
+    color: white;
+    font-weight: bold;
+    padding: 0 6px 0 1px; 
+    line-height: 20px;
+    font-size: 15px;
+}
+
+.vis-cluster .vis-item-content div:before {
+    content: "";
+    display: block;
+    background: url("twitter-icon.svg") no-repeat;
+    background-size: contain;
+    width: 25px;
+    height: 25px;
+    float: left;
+    position: relative;
+    left: -3px;
+    top: -3px;
+}
+
+.timevis.html-widget .zoom-menu .btn {
+    color: #333;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 2px;
+    border: 1px solid rgba(0,0,0,0.2);
+    width: 30px;
+    height: 30px;
+    background: white;
+    box-shadow: 0 0 2px #ddd; 
+}
+
+.btn.active.focus, .btn.active:focus, .btn.focus, .btn:active.focus, .btn:active:focus, .btn:focus {
+    outline: none;
+    outline-offset: none;
+}
+
 .timevis.html-widget .vis-background .vis-minor.vis-odd {
-    background: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
+    background-color: transparent !important;
+}
+
+.marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div{
+    background-color: #2daae1 !important;
+    width: max-content !important;
+    box-shadow: 3px 2px 3px rgb(100 100 100 / 33%) !important;
+}
+
+.marker-cluster-small div span:before, .marker-cluster-medium div span:before, .marker-cluster-large div span:before {
+    content: "";
+    display: block;
+    background: url("twitter-icon.svg") no-repeat;
+    background-size: contain;
+    width: 25px;
+    height: 25px;
+    float: left;
+    margin: 2px;
+    position: relative;
+    left: 2px;
+}
+
+.marker-cluster-small div span, .marker-cluster-medium div span, .marker-cluster-large div span {
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    width: max-content;
+    padding: 0 12px 0 3px;
 }
 
 #brand {

@@ -4,9 +4,10 @@ library(dplyr)
 library(leaflet)
 library(timevis)
 library(htmlwidgets)
+source("helpers.R")
 
 
-Sys.setenv(OPENCAGE_KEY = readRDS("opencage_api.rds"))
+#Sys.setenv(OPENCAGE_KEY = readRDS("opencage_api.rds"))
 
 ui <- bootstrapPage(
     tags$head(
@@ -27,35 +28,57 @@ ui <- bootstrapPage(
 
 server <- function(input, output, session) {
   
+  data <- reactivePoll(10000, session,
+                       checkFunc = function() {
+                         get_last_tweet_time()
+                       },
+                       valueFunc = function() {
+                         get_tweets_from_db()
+                       }
+  )
+  
+  
+  twitterIcon <- makeIcon(
+    iconUrl = "twitter-icon.svg",
+    iconWidth = 30, iconHeight = 30,
+    iconAnchorX = 15, iconAnchorY = 15,
+    popupAnchorY = -30
+  )
+  
+  tweets <- get_tweets_from_db()
+  
   output$map <- renderLeaflet({
-    leaflet(options = leafletOptions(zoomControl = FALSE)) %>%
-      addProviderTiles("OpenStreetMap.DE") %>%
-
+    leaflet(data(), options = leafletOptions(zoomControl = FALSE)) %>%
+      addProviderTiles("OpenStreetMap.Mapnik") %>%
+      addMarkers(lng = ~lng, lat = ~lat, popup = ~embed_code, icon = twitterIcon, group = ~id, clusterOptions = markerClusterOptions()) %>%
+      
       htmlwidgets::onRender(
-		"function(el, x) {
-			map = this;	
-			L.control.zoom({
-				position:'topright'
-			}).addTo(this);
-
-
-            var redIcon = new L.Icon({
-                iconUrl: 'marker-icon-2x-red.png',
-                shadowUrl: 'marker-shadow.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
-            });
-
-            var marker = new L.marker([50.830130,4.406470], {icon: redIcon}).addTo(map);
-
-		}") %>%
+        "function(el, x) {
+			      map = this;
+			      const event = new Event('mapReady');
+            document.dispatchEvent(event);
+			      L.control.zoom({
+				      position:'topright'
+			      }).addTo(this);
+		      }"
+      ) %>%
       setView(4.406470, 50.830130, zoom = 6)
   })
 
+  observe({
+    invalidateLater(100000, session)
+    insert_tweets_in_db()
+  })
+  
   output$timeline <- renderTimevis(
-      timevis()
+    timevis(data(), options = list(type = 'point', cluster = T, height = 95)) %>%
+      htmlwidgets::onRender(
+        "function(el, x) {
+			      timevis = this;
+			      const event = new Event('timelineReady');
+            document.dispatchEvent(event);
+		      }"
+      )
   )
 }
 shinyApp(ui, server)
