@@ -28,25 +28,31 @@ html, body {
 
 #timeline {
 	position: absolute;
-	bottom: 115px;
+	bottom: 135px;
+}
+
+.timevis.html-widget .zoom-menu {
+    right: 10px;
+    top: 15px;
 }
 
 .vis-background {
 	background-color: rgba(255, 255, 255, 0.2);
 }
 
-.vis-group, .vis-itemset {
-    height: 35px !important;
+.vis-dot:before {
+    background: url("twitter-icon.svg") no-repeat;
+    width: 30px !important;
+    height: 30px !important;
+    position: absolute;
+    content: '';
+    top: -20px;
+    left: -15px;
 }
 
 .vis-dot {
-    background: url("twitter-icon.svg") no-repeat;
     border: none !important;
     border-radius: 100px !important;
-    width: 30px !important;
-    height: 30px !important;
-    margin-left: -15px !important;
-    margin-top: 3px !important;
     box-shadow: 3px 2px 3px rgb(100 100 100 / 33%) !important;
 }
 
@@ -61,12 +67,7 @@ html, body {
 }
 
 .vis-cluster {
-    background-color: #2daae1 !important;
-    width: max-content !important;
-    border-radius: 100px !important;
-    height: 30px !important;
-    margin-top: -6px;
-    box-shadow: 3px 2px 3px rgb(100 100 100 / 33%) !important;
+    background-color: transparent;
 }
 
 .vis-cluster.vis-selected {
@@ -76,9 +77,15 @@ html, body {
 .vis-cluster .vis-item-content div {
     color: white;
     font-weight: bold;
-    padding: 0 6px 0 1px; 
-    line-height: 20px;
+    padding: 0 6px 0 1px;
+    background-color: #2daae1 !important;
+    line-height: 25px;
     font-size: 15px;
+    padding: 3px 10px 3px 30px;
+    border-radius: 100px;
+    position: absolute;
+    top: -10px;
+    left: -15px;
 }
 
 .vis-cluster .vis-item-content div:before {
@@ -89,9 +96,9 @@ html, body {
     width: 25px;
     height: 25px;
     float: left;
-    position: relative;
-    left: -3px;
-    top: -3px;
+    position: absolute;
+    left: 2px;
+    top: 3px;
 }
 
 .timevis.html-widget .zoom-menu .btn {

@@ -31,7 +31,11 @@ $(document).on('mapReady', function() {
 $(document).on('timelineReady', function() {
     $('.btn.zoom-out').text('−');
     timevis.timeline.on('mouseDown', function(el) {
-
+        console.log(el);
+        var item = timevis.timeline.itemSet.items[el.item];
+        var lat = item.data.lat;
+        var lng = item.data.lng;
+        map.panTo([lat, lng]);
         map.eachLayer(function(layer) {
             if (layer.options.group) {
                 if (layer.options.group == el.item) {

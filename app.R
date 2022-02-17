@@ -71,7 +71,7 @@ server <- function(input, output, session) {
   })
   
   output$timeline <- renderTimevis(
-    timevis(data(), options = list(type = 'point', cluster = T, height = 95)) %>%
+    timevis(data(), options = list(type = 'point', height= 110, cluster = TRUE)) %>%
       htmlwidgets::onRender(
         "function(el, x) {
 			      timevis = this;
