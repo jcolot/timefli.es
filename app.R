@@ -42,7 +42,7 @@ server <- function(input, output, session) {
     iconUrl = "twitter-icon.svg",
     iconWidth = 30, iconHeight = 30,
     iconAnchorX = 15, iconAnchorY = 15,
-    popupAnchorY = -30
+    popupAnchorY = -15, popupAnchorX = 1
   )
   
   tweets <- get_tweets_from_db()
