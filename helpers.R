@@ -1,8 +1,11 @@
 library(dplyr)
 library(jsonlite)
 library(DBI)
+library(httr)
+library(curl)
 
-get_tweets_from_api <- function() {
+
+connect_to_tweet_stream <- function() {
   bearer_token <- readRDS(file = "twitter_bearer_token.rds")
   
   if (substr(bearer_token, 1, 7) == "Bearer ") {
@@ -11,82 +14,57 @@ get_tweets_from_api <- function() {
     bearer_token <- paste0("Bearer ", bearer_token)
   }
   
-  url <- "https://api.twitter.com/2/users/1492628588046303237/tweets"
+  #url <- "https://api.twitter.com/2/users/1492628588046303237/tweets"
+  url <- "https://api.twitter.com/2/tweets/search/stream"
   
-  #url <- "https://api.twitter.com/2/users/28131948/tweets"
   
-  params = list(
-    "max_results" = 5,
-    "tweet.fields" = "author_id,created_at",
-    "expansions" = "geo.place_id",
-    "place.fields" = "contained_within,country,country_code,full_name,geo,id,name,place_type"
-  )
+  h <- new_handle()
+  handle_setheaders(h, "Authorization" = bearer_token)
   
-  r <-
-    httr::GET(url, httr::add_headers(Authorization = bearer_token), query =
-                params)
   
-
-  #fix random 503 errors
-  count <- 0
-  while (httr::status_code(r) == 503 & count < 4) {
-    r <-
-      httr::GET(url,
-                httr::add_headers(Authorization = bearer_token),
-                query = params)
-    count <- count + 1
-    Sys.sleep(count * 5)
-  }
+  url <-
+    "https://api.twitter.com/2/tweets/search/stream?tweet.fields=author_id,created_at&expansions=geo.place_id&place.fields=contained_within,country,country_code,full_name,geo,id,name,place_type"
+  con <- curl(url = url, handle = h)
   
-  if (httr::status_code(r) != 200) {
-    stop(paste("something went wrong. Status code:", httr::status_code(r)))
-    
-  }
-  if (httr::headers(r)$`x-rate-limit-remaining` == "1") {
-    warning(paste(
-      "x-rate-limit-remaining=1. Resets at",
-      as.POSIXct(
-        as.numeric(httr::headers(r)$`x-rate-limit-reset`),
-        origin = "1970-01-01"
-      )
-    ))
-  }
-  tweets <- jsonlite::fromJSON(httr::content(r, "text"))
-  con <- dbConnect(RSQLite::SQLite(), "db.sqlite")
-  
-  res <- dbSendQuery(
+  stream_in(
     con,
-    paste0(
-      "SELECT id from tweet where id in (", toString(tweets$data$id), ")"
-    )
+    verbose = T,
+    handler = function(tweet) {
+      print(tweet)
+      if ("places" %in% colnames(tweet))
+      {
+        new_tweet <<- tweet
+      }
+      try({
+        id  <- tweet$data$id
+        author_id <- tweet$data$author_id
+        new_tweet <<- tweet
+        
+        # only save geotagged tweets (has includes places)
+        if ("includes" %in% colnames(tweet))
+        {
+          url <- paste0('https://twitter.com/', author_id, '/status/', id)
+          embed_code <- get_tweet_embed_code(url)
+          tweet$data$embed_code <- embed_code
+          insert_tweet_in_db(tweet)
+          
+        }
+      })
+    },
+    pagesize = 1
   )
-  res <- dbFetch(res)
-
-  new_tweets <<- merge(x = res, y = tweets$data, by = "id", all = TRUE)
-  
-  for( i in rownames(new_tweets)) {
-    id  <- new_tweets[i, "id"]
-    author_id <- new_tweets[i, "author_id"]
-    url <- paste0('https://twitter.com/', author_id, '/status/', id)
-    embed_code <- get_tweet_embed_code(url)
-    tweets$data$embed_code[which(tweets$data$id == id)] <- embed_code
-  }
-  
-  tweets
 }
 
-insert_tweets_in_db <- function() {
+insert_tweet_in_db <- function(tweet) {
   con <- dbConnect(RSQLite::SQLite(), "db.sqlite")
-  tweets <- get_tweets_from_api()
-  
+
   tryCatch({
-    includes <- tweets$includes
+    includes <- tweet$includes
     places <- includes$places
-    places <- flatten(places)
+    places <- flatten(as.data.frame(places))
     places$lat <- sapply(places$geo.bbox, function(x){(x[2] + x[4]) / 2})
     places$lng <- sapply(places$geo.bbox, function(x){(x[1] + x[3]) / 2})
     places$geo.bbox <-sapply(places$geo.bbox, function(x) {toString(x)}) 
-    places <- as.data.frame(places)
     places <- places %>% 
       rename(
         bbox = geo.bbox,
@@ -127,13 +105,13 @@ insert_tweets_in_db <- function() {
     # Choose a return value in case of error
     return(NA)
   })
-  tweets <- tweets$data
-  tweets <- mutate(tweets, place_id = geo$place_id)
-  tweets <- subset(tweets, select = c('id', 'text', 'created_at', 'place_id', 'author_id', 'embed_code'))
+  tweet <- tweet$data
+  tweet <- mutate(tweet, place_id = geo$place_id)
+  tweet <- subset(tweet, select = c('id', 'text', 'created_at', 'place_id', 'author_id', 'embed_code'))
 
   dbWriteTable(
     con,
-    value = tweets,
+    value = tweet,
     name = "tweet_temp",
     overwrite = TRUE,
     row.names = FALSE

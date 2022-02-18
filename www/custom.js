@@ -8,7 +8,6 @@ $(document).on('ready', function() {
     function onSuccess(position) {
         setTimeout(function() {
             var coords = position.coords;
-            console.log(coords.latitude + ", " + coords.longitude);
             Shiny.onInputChange("geolocation", true);
             Shiny.onInputChange("lat", coords.latitude);
             Shiny.onInputChange("long", coords.longitude);
@@ -31,7 +30,6 @@ $(document).on('mapReady', function() {
 $(document).on('timelineReady', function() {
     $('.btn.zoom-out').text('−');
     timevis.timeline.on('mouseDown', function(el) {
-        console.log(el);
         var item = timevis.timeline.itemSet.items[el.item];
         var lat = item.data.lat;
         var lng = item.data.lng;

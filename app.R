@@ -65,11 +65,6 @@ server <- function(input, output, session) {
       setView(4.406470, 50.830130, zoom = 6)
   })
 
-  observe({
-    invalidateLater(100000, session)
-    insert_tweets_in_db()
-  })
-  
   output$timeline <- renderTimevis(
     timevis(data(), options = list(type = 'point', height= 110, cluster = TRUE)) %>%
       htmlwidgets::onRender(
