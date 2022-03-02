@@ -101,6 +101,7 @@ div.outer {
     position: absolute;
     top: -10px;
     left: -15px;
+    cursor: pointer;
 }
 
 .vis-cluster .vis-item-content div:before {
