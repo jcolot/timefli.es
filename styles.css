@@ -1,0 +1,175 @@
+html, body {
+    width:100%;
+    height:100%; 
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif
+}
+
+.navbar-brand a {
+    color: white;
+    text-shadow: 1px 1px rgba(0,0,0,0.5);
+    font-size: 27px;
+    font-weight: 500;
+    color: white;
+    line-height: 20px;
+}
+
+div.outer {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+#timeline {
+	position: absolute;
+	bottom: 135px;
+}
+
+#description {
+  /* Appearance */
+  background-color: white;
+  padding: 25px; 
+  cursor: move;
+  /* Fade out while not hovering */
+  opacity: 0.85;
+  zoom: 0.9;
+  transition: opacity 500ms 1s;
+}
+
+#description:hover {
+  /* Fade in while hovering */
+  opacity: 0.95;
+  transition-delay: 0;
+}
+
+.timevis.html-widget .zoom-menu {
+    right: 10px;
+    top: 15px;
+}
+
+.vis-background {
+	background-color: rgba(255, 255, 255, 0.2);
+}
+
+.vis-dot:before {
+    background: url("twitter-icon.svg") no-repeat;
+    width: 30px !important;
+    height: 30px !important;
+    position: absolute;
+    content: '';
+    top: -20px;
+    left: -10px;
+    cursor: pointer;
+}
+
+.vis-dot {
+    border: none !important;
+    border-radius: 100px !important;
+    box-shadow: 3px 2px 3px rgb(100 100 100 / 33%) !important;
+}
+
+
+.vis-item.vis-point.vis-selected {
+    background-color: transparent !important;
+}
+
+.vis-item.vis-selected {
+    border-color: transparent !important;
+    background-color: transparent !important;
+}
+
+.vis-cluster {
+    background-color: transparent;
+}
+
+.vis-cluster.vis-selected {
+    background-color: #2daae1 !important;
+}
+
+.vis-cluster .vis-item-content div {
+    color: white;
+    font-weight: bold;
+    padding: 0 6px 0 1px;
+    background-color: #2daae1 !important;
+    line-height: 25px;
+    font-size: 15px;
+    padding: 3px 10px 3px 30px;
+    border-radius: 100px;
+    position: absolute;
+    top: -10px;
+    left: -15px;
+}
+
+.vis-cluster .vis-item-content div:before {
+    content: "";
+    display: block;
+    background: url("twitter-icon.svg") no-repeat;
+    background-size: contain;
+    width: 25px;
+    height: 25px;
+    float: left;
+    position: absolute;
+    left: 2px;
+    top: 3px;
+}
+
+.timevis.html-widget .zoom-menu .btn {
+    color: #333;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 2px;
+    border: 1px solid rgba(0,0,0,0.2);
+    width: 30px;
+    height: 30px;
+    background: white;
+    box-shadow: 0 0 2px #ddd; 
+}
+
+.btn.active.focus, .btn.active:focus, .btn.focus, .btn:active.focus, .btn:active:focus, .btn:focus {
+    outline: none;
+    outline-offset: none;
+}
+
+.timevis.html-widget .vis-background .vis-minor.vis-odd {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
+    background-color: transparent !important;
+}
+
+.marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div{
+    background-color: #2daae1 !important;
+    width: max-content !important;
+    box-shadow: 3px 2px 3px rgb(100 100 100 / 33%) !important;
+}
+
+.marker-cluster-small div span:before, .marker-cluster-medium div span:before, .marker-cluster-large div span:before {
+    content: "";
+    display: block;
+    background: url("twitter-icon.svg") no-repeat;
+    background-size: contain;
+    width: 25px;
+    height: 25px;
+    float: left;
+    margin: 2px;
+    position: relative;
+    left: 2px;
+}
+
+.marker-cluster-small div span, .marker-cluster-medium div span, .marker-cluster-large div span {
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    width: max-content;
+    padding: 0 12px 0 3px;
+}
+
+#brand {
+	postion: absolute;
+	left: 40px;
+	top: 10px;
+}
