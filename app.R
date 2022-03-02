@@ -110,21 +110,13 @@ server <- function(input, output, session) {
       type = 'point',
       height = 110,
       cluster = TRUE
-    )) %>%
-      htmlwidgets::onRender(
+    )) %>% htmlwidgets::onRender(
         "function(el, x) {
 			     timevis = this;
 			     const event = new Event('timelineReady');
            document.dispatchEvent(event);
-           var options = var options = {
-             margin: {
-               item : {
-                 horizontal : 0
-               }
-             }
-           };
 		     }"
       )
-  )
+   )
 }
 shinyApp(ui, server)
