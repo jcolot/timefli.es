@@ -32,35 +32,41 @@ $(document).on('mapReady', function() {
 $(document).on('timelineReady', function() {
     $('.btn.zoom-out').text('−');
     timevis.timeline.on('mouseDown', function(el) {
-        var item = timevis.timeline.itemSet.items[el.item];
-        var lat = item.data.lat;
-        var lng = item.data.lng;
-        map.panTo([lat, lng]);
-        map.eachLayer(function(layer) {
-            if (layer.options.group) {
-                if (layer.options.group == el.item) {
-                    L.popup({
-                            offset: [3, -7]
-                        })
-                        .setLatLng(layer.getLatLng())
-                        .setContent(layer.options.popup)
-                        .openOn(map);
-                }
-            } else if (layer.getAllChildMarkers) {
-                layer.getAllChildMarkers().forEach(
-                    function(marker) {
-                        if (marker.options.group == el.item) {
-                            L.popup({
-                                    offset: [3, -7]
-                                })
-                                .setLatLng(layer.getLatLng())
-                                .setContent(marker.options.popup)
-                                .openOn(map);
-                        }
+        const item = timevis.timeline.itemSet.getItemById(el.item);
+        if (!item) return;
+        if (!item.isCluster) {
+            const lat = item.data.lat;
+            const lng = item.data.lng;
+            map.panTo([lat, lng]);
+            map.eachLayer(function(layer) {
+                if (layer.options.group) {
+                    if (layer.options.group == el.item) {
+                        L.popup({
+                                offset: [3, -7]
+                            })
+                            .setLatLng(layer.getLatLng())
+                            .setContent(layer.options.popup)
+                            .openOn(map);
                     }
-                )
-            }
-        });
+                } else if (layer.getAllChildMarkers) {
+                    layer.getAllChildMarkers().forEach(
+                        function(marker) {
+                            if (marker.options.group == el.item) {
+                                L.popup({
+                                        offset: [3, -7]
+                                    })
+                                    .setLatLng(layer.getLatLng())
+                                    .setContent(marker.options.popup)
+                                    .openOn(map);
+                            }
+                        }
+                    )
+                }
+            });
+        } else {
+            const offset = (item.data.max - item.data.min) * 0.2;
+            timevis.timeline.setWindow(item.data.min - offset, item.data.max + offset);
+        }
     });
     timevis.timeline.itemSet.clusterGenerator._dropLevelsCache();
     timevis.timeline.itemSet.clusterGenerator.getClusters = function(oldClusters, scale, options) {
