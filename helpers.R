@@ -14,9 +14,7 @@ connect_to_tweet_stream <- function() {
     bearer_token <- paste0("Bearer ", bearer_token)
   }
   
-  #url <- "https://api.twitter.com/2/users/1492628588046303237/tweets"
   url <- "https://api.twitter.com/2/tweets/search/stream"
-  
   
   h <- new_handle()
   handle_setheaders(h, "Authorization" = bearer_token)
@@ -26,51 +24,64 @@ connect_to_tweet_stream <- function() {
     "https://api.twitter.com/2/tweets/search/stream?tweet.fields=author_id,created_at&expansions=geo.place_id&place.fields=contained_within,country,country_code,full_name,geo,id,name,place_type"
   con <- curl(url = url, handle = h)
   
-  stream_in(
-    con,
-    verbose = T,
-    handler = function(tweet) {
-      print(tweet)
-      if ("places" %in% colnames(tweet))
-      {
-        new_tweet <<- tweet
-      }
-      try({
-        id  <- tweet$data$id
-        author_id <- tweet$data$author_id
-        new_tweet <<- tweet
-        
-        # only save geotagged tweets (has includes places)
-        if ("includes" %in% colnames(tweet))
-        {
-          url <- paste0('https://twitter.com/', author_id, '/status/', id)
-          embed_code <- get_tweet_embed_code(url)
-          tweet$data$embed_code <- embed_code
-          insert_tweet_in_db(tweet)
-          
-        }
-      })
-    },
-    pagesize = 1
-  )
+  
+  tryCatch({
+    stream_in(
+      con,
+      verbose = T,
+      handler = function(tweet) {
+
+        try({
+          id  <- tweet$data$id
+          author_id <- tweet$data$author_id
+
+          # only save geotagged tweets (has includes places)
+          if ("includes" %in% colnames(tweet))
+          {
+            url <- paste0('https://twitter.com/', author_id, '/status/', id)
+            embed_code <- get_tweet_embed_code(url)
+            tweet$data$embed_code <- embed_code
+            insert_tweet_in_db(tweet)
+            
+          }
+        })
+      },
+      pagesize = 1
+    )
+  }, error = function(cond) {
+    #connect_to_tweet_stream()
+    if (grepl('429', cond$message)) {
+      print(cond);
+      Sys.sleep(500);
+      connect_to_tweet_stream();
+      
+    }
+  })
 }
 
 insert_tweet_in_db <- function(tweet) {
   con <- dbConnect(RSQLite::SQLite(), "db.sqlite")
-
+  
   tryCatch({
     includes <- tweet$includes
     places <- includes$places
     places <- flatten(as.data.frame(places))
-    places$lat <- sapply(places$geo.bbox, function(x){(x[2] + x[4]) / 2})
-    places$lng <- sapply(places$geo.bbox, function(x){(x[1] + x[3]) / 2})
-    places$geo.bbox <-sapply(places$geo.bbox, function(x) {toString(x)}) 
-    places <- places %>% 
-      rename(
-        bbox = geo.bbox,
-        type = geo.type
-      )
-
+    places$lat <-
+      sapply(places$geo.bbox, function(x) {
+        (x[2] + x[4]) / 2
+      })
+    places$lng <-
+      sapply(places$geo.bbox, function(x) {
+        (x[1] + x[3]) / 2
+      })
+    places$geo.bbox <-
+      sapply(places$geo.bbox, function(x) {
+        toString(x)
+      })
+    places <- places %>%
+      rename(bbox = geo.bbox,
+             type = geo.type)
+    
     dbWriteTable(
       con,
       value = places,
@@ -107,8 +118,17 @@ insert_tweet_in_db <- function(tweet) {
   })
   tweet <- tweet$data
   tweet <- mutate(tweet, place_id = geo$place_id)
-  tweet <- subset(tweet, select = c('id', 'text', 'created_at', 'place_id', 'author_id', 'embed_code'))
-
+  tweet <-
+    subset(tweet,
+           select = c(
+             'id',
+             'text',
+             'created_at',
+             'place_id',
+             'author_id',
+             'embed_code'
+           ))
+  
   dbWriteTable(
     con,
     value = tweet,
@@ -164,35 +184,31 @@ get_last_tweet_time <- function() {
   con <- dbConnect(RSQLite::SQLite(), "db.sqlite")
   
   
-  res <- dbSendQuery(
-    con,
-    paste0(
-      "SELECT max(datetime(created_at)) from tweet"
-    )
-  )
+  res <- dbSendQuery(con,
+                     paste0("SELECT max(datetime(created_at)) from tweet"))
   res <- dbFetch(res)
   as.character(res)
 }
 
 
 get_tweet_embed_code <- function(tweet_url) {
-    url <- httr::parse_url("https://publish.twitter.com/oembed")
-    url$query <- list(
-      url = tweet_url,
-      maxwidth = 350,
-      hide_thread = T,
-      omit_script = F,
-      align = "center",
-      dnt = T
-    )
-    
-    url <- httr::build_url(url)
-    res <- httr::GET(url)
-    httr::stop_for_status(res)
-    if (!grepl("application/json", res$headers$`content-type`)) {
-      stop("Expected json response, got ", res$headers$`content-type`)
-    }
-    res_txt <- httr::content(res, "text")
-    res_json <- jsonlite::fromJSON(res_txt)
-    htmltools::HTML(res_json$html)
+  url <- httr::parse_url("https://publish.twitter.com/oembed")
+  url$query <- list(
+    url = tweet_url,
+    maxwidth = 350,
+    hide_thread = T,
+    omit_script = F,
+    align = "center",
+    dnt = T
+  )
+  
+  url <- httr::build_url(url)
+  res <- httr::GET(url)
+  httr::stop_for_status(res)
+  if (!grepl("application/json", res$headers$`content-type`)) {
+    stop("Expected json response, got ", res$headers$`content-type`)
+  }
+  res_txt <- httr::content(res, "text")
+  res_json <- jsonlite::fromJSON(res_txt)
+  htmltools::HTML(res_json$html)
 }
