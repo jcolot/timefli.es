@@ -63,6 +63,8 @@ div.outer {
     top: -20px;
     left: -10px;
     cursor: pointer;
+    border-radius: 100px;
+    box-shadow: 3px 2px 3px rgb(100 100 100 / 33%) !important;
 }
 
 .vis-dot {
@@ -102,6 +104,7 @@ div.outer {
     top: -10px;
     left: -15px;
     cursor: pointer;
+    box-shadow: 3px 2px 3px rgb(100 100 100 / 33%) !important;
 }
 
 .vis-cluster .vis-item-content div:before {
@@ -159,6 +162,7 @@ div.outer {
     margin: 2px;
     position: relative;
     left: 2px;
+    border-radius: 100px;
 }
 
 .marker-cluster-small div span, .marker-cluster-medium div span, .marker-cluster-large div span {
@@ -167,6 +171,11 @@ div.outer {
     font-size: 15px;
     width: max-content;
     padding: 0 12px 0 3px;
+}
+
+.leaflet-marker-icon:not(.marker-cluster) {
+    border-radius: 100px;
+    box-shadow: 3px 2px 3px rgb(100 100 100 / 33%) !important;
 }
 
 #brand {
