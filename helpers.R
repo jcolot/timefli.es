@@ -49,13 +49,13 @@ connect_to_tweet_stream <- function() {
       pagesize = 1
     )
   }, error = function(cond) {
-    #connect_to_tweet_stream()
+    print(cond);
     if (grepl('429', cond$message)) {
       print(cond);
       Sys.sleep(500);
-      connect_to_tweet_stream();
-      
     }
+    Sys.sleep(10);
+    connect_to_tweet_stream();
   })
 }
 

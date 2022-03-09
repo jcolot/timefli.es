@@ -20,7 +20,7 @@ ui <- bootstrapPage(
   ),
   
   navbarPage(
-    theme = shinytheme("flatly"),
+    theme = shinytheme("cosmo"),
     collapsible = TRUE,
     HTML(
       '<a style="text-decoration:none;cursor:default;color:#FFFFFF;" class="active" href="#">timefli.es</a>'
@@ -52,7 +52,7 @@ ui <- bootstrapPage(
         )
       )
     ),
-    tabPanel("About this site", div(class = "outer", ""))
+    tabPanel("About this site", includeHTML("about.html"))
   )
 )
 

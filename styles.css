@@ -1,7 +1,19 @@
 html, body {
     width:100%;
     height:100%; 
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important
+}
+
+h1,h2,h3,h4,h5,p {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important
+}
+
+h1 {
+    font-size: 32px !important;
+}
+
+.navbar {
+    margin-bottom: 0 !important;
 }
 
 .navbar-brand a {
@@ -15,7 +27,7 @@ html, body {
 
 div.outer {
   position: fixed;
-  top: 56px;
+  top: 45px;
   left: 0;
   right: 0;
   bottom: 0;
