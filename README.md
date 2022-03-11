@@ -3,7 +3,7 @@
 Visit the app at [timefli.es](https://timefli.es)
 
 
-This application uses geocoded tweets from the @timefli_es account and displays them on a timeline and on a map.
+This application uses geocoded tweets containing #timeflies hashtag and displays them on a timeline and on a map.
 
 
 ## Credits
