@@ -1,0 +1,20 @@
+<script>
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(twitterIntent, function() {
+        alert("You need to allow access to geolocation to use this button.");
+    });
+  } else {
+    alert("Geolocation is not supported by this browser.");
+  }
+}
+
+function twitterIntent(position) {
+    const latLng = position.coords.latitude + '%2C' + position.coords.longitude;
+    const url = "https://twitter.com/intent/tweet?text=%40timefli_es%0aTwitted%20from%20" + latLng;
+    window.open(url, '_blank');
+}
+</script>
+<div>
+    <button class="btn-twitter" onclick="getLocation()">Tweet</button>
+</div>

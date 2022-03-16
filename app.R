@@ -47,7 +47,9 @@ ui <- bootstrapPage(
             "Want your tweet on this map? Send a ",
             tags$a(href = 'https://help.twitter.com/en/using-twitter/tweet-location', "geo-tagged"),
             " tweet with the hashtag",
-            tags$a(href = 'https://twitter.com/search?q=%23timeflies', "#timeflies")
+            tags$a(href = 'https://twitter.com/search?q=%23timeflies', "#timeflies"),
+            " or just click on the button below and I'd be happy if you join a picture!",
+            includeHTML("twitter-button.html")
           )
         )
       )

@@ -25,6 +25,16 @@ h1 {
     line-height: 20px;
 }
 
+.btn-twitter {
+    background-color: rgb(29, 155, 240);
+    border-radius: 100px;
+    border: none;
+    padding: 5px 15px;
+    margin-top: 15px;
+    font-weight: bold;
+    color: white;
+}
+
 div.outer {
   position: fixed;
   top: 45px;
@@ -42,11 +52,10 @@ div.outer {
 
 #description {
   /* Appearance */
-  background-color: white;
+  background-color: #ffffffdd;
   padding: 25px; 
   cursor: move;
   /* Fade out while not hovering */
-  opacity: 0.85;
   zoom: 0.9;
   transition: opacity 500ms 1s;
 }
@@ -63,7 +72,7 @@ div.outer {
 }
 
 .vis-background {
-	background-color: rgba(255, 255, 255, 0.2);
+	background-color: rgba(255, 255, 255, 0.3);
 }
 
 .vis-dot:before {

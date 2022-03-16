@@ -30,32 +30,48 @@ connect_to_tweet_stream <- function() {
       con,
       verbose = T,
       handler = function(tweet) {
-
-        try({
-          id  <- tweet$data$id
-          author_id <- tweet$data$author_id
-
-          # only save geotagged tweets (has includes places)
-          if ("includes" %in% colnames(tweet))
-          {
-            url <- paste0('https://twitter.com/', author_id, '/status/', id)
-            embed_code <- get_tweet_embed_code(url)
-            tweet$data$embed_code <- embed_code
-            insert_tweet_in_db(tweet)
+        if (length(tweet)) {
+          try({
+            id  <- tweet$data$id;
+            author_id <- tweet$data$author_id;
+            tweet_text <- tweet$data$text;
             
-          }
-        })
+            if (!is.null(tweet_text)) {
+              location <-
+                str_extract(tweet_text, "[0-9]*\\.[0-9]*,[0-9]*\\.[0-9]*");
+            }
+            # only save geotagged tweets (has includes places)
+            if ("includes" %in% colnames(tweet))
+            {
+              url <- paste0('https://twitter.com/', author_id, '/status/', id);
+              embed_code <- get_tweet_embed_code(url);
+              tweet$data$embed_code <- embed_code;
+              insert_tweet_in_db(tweet);
+            } else if (!is.null(location) & !is.na(location)) {
+              url <- paste0('https://twitter.com/', author_id, '/status/', id);
+              embed_code <- get_tweet_embed_code(url);
+              tweet$data$embed_code <- embed_code;
+              tweet$data$location <- location;
+              insert_tweet_in_db(tweet);
+            }
+          })
+        }
       },
       pagesize = 1
     )
   }, error = function(cond) {
-    print(cond);
+    print(cond)
+    
     if (grepl('429', cond$message)) {
-      print(cond);
-      Sys.sleep(500);
+      print(cond)
+      
+      Sys.sleep(500)
+      
     }
-    Sys.sleep(10);
-    connect_to_tweet_stream();
+    Sys.sleep(10)
+    
+    connect_to_tweet_stream()
+    
   })
 }
 
@@ -63,24 +79,45 @@ insert_tweet_in_db <- function(tweet) {
   con <- dbConnect(RSQLite::SQLite(), "db.sqlite")
   
   tryCatch({
-    includes <- tweet$includes
-    places <- includes$places
-    places <- flatten(as.data.frame(places))
-    places$lat <-
-      sapply(places$geo.bbox, function(x) {
-        (x[2] + x[4]) / 2
-      })
-    places$lng <-
-      sapply(places$geo.bbox, function(x) {
-        (x[1] + x[3]) / 2
-      })
-    places$geo.bbox <-
-      sapply(places$geo.bbox, function(x) {
-        toString(x)
-      })
-    places <- places %>%
-      rename(bbox = geo.bbox,
-             type = geo.type)
+    if ("includes" %in% colnames(tweet)) {
+      includes <- tweet$includes
+      places <- includes$places
+      places <- flatten(as.data.frame(places))
+      places$lat <-
+        sapply(places$geo.bbox, function(x) {
+          (x[2] + x[4]) / 2
+        })
+      places$lng <-
+        sapply(places$geo.bbox, function(x) {
+          (x[1] + x[3]) / 2
+        })
+      places$geo.bbox <-
+        sapply(places$geo.bbox, function(x) {
+          toString(x)
+        })
+      places <- places %>%
+        rename(bbox = geo.bbox,
+               type = geo.type)
+    } else {
+      location <- tweet$data$location;
+      coords <- str_split(location, ",")[[1]];
+      lat <- coords[1];
+      lng <- coords[2];
+      id <- random_id(bytes = 8);
+      tweet$data$place_id <- id;
+      places <- data.frame(
+        id = id,
+        lat = lat,
+        lng = lng,
+        type = 'custom',
+        place_type = '',
+        full_name = '',
+        country_code = 'unknown',
+        name = '',
+        country = 'unknown',
+        bbox = ''
+      )
+    }
     
     dbWriteTable(
       con,
@@ -112,12 +149,16 @@ insert_tweet_in_db <- function(tweet) {
     )
     
   }, error = function(cond) {
-    message(cond)
+    message(cond);
     # Choose a return value in case of error
     return(NA)
   })
   tweet <- tweet$data
-  tweet <- mutate(tweet, place_id = geo$place_id)
+  if (! "place_id" %in% colnames(tweet))
+  {    
+    tweet <- mutate(tweet, place_id = geo$place_id);
+  }
+  
   tweet <-
     subset(tweet,
            select = c(
@@ -153,7 +194,6 @@ insert_tweet_in_db <- function(tweet) {
 
 get_tweets_from_db <- function() {
   con <- dbConnect(RSQLite::SQLite(), "db.sqlite")
-  
   
   res <- dbSendQuery(
     con,
