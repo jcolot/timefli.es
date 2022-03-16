@@ -2,6 +2,7 @@ library(dplyr)
 library(jsonlite)
 library(DBI)
 library(httr)
+library(stringr)
 library(curl)
 
 

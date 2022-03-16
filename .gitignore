@@ -47,3 +47,4 @@ vignettes/*.pdf
 opencage_api.rds
 
 twitter_bearer_token.rds
+db.sqlite
