@@ -137,7 +137,7 @@ $(document).on('timelineReady', function() {
                         const clusterItems = clusterItemsArray[i];
                         const minCenter = clusterItems[0].center;
                         const maxCenter = clusterItems[clusterItems.length - 1].center;
-                        if (maxCenter - minCenter > 2.5 * timeWindow) {
+                        if (maxCenter - minCenter > 3 * timeWindow) {
                             let j = 0;
                             let newClusterItems = [];
                             while (j < clusterItems.length) {

@@ -38,7 +38,7 @@ h1 {
 
 #twitter-button:hover {
     background-color: rgb(26, 140, 216);
-    font-decoration: none !important;
+    text-decoration: none !important;
 }
 
 div.outer {
