@@ -25,6 +25,12 @@ h1 {
     line-height: 20px;
 }
 
+.github-icon {
+    padding: 8px !important;
+    position: relative !important;
+    top: 5px;
+}
+
 #twitter-button {
     background-color: rgb(29, 155, 240);
     border-radius: 100px;

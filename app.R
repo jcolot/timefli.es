@@ -5,6 +5,8 @@ library(leaflet)
 library(timevis)
 library(htmlwidgets)
 library(shinythemes)
+library(bslib)
+
 
 source("helpers.R")
 
@@ -18,6 +20,7 @@ ui <- bootstrapPage(
                 type = "text/javascript"),
     tags$script(src = "custom.js", type = "text/javascript")
   ),
+  
   
   navbarPage(
     theme = shinytheme("cosmo"),
@@ -54,7 +57,8 @@ ui <- bootstrapPage(
         )
       )
     ),
-    tabPanel("About this site", includeHTML("about.html"))
+    tabPanel("About", includeHTML("about.html")),
+    nav_item(a(href="http://github.com/jcolot/timefli.es", class="github-icon", target="_blank", includeHTML("github-icon.svg")))
   )
 )
 
