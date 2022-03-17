@@ -80,7 +80,7 @@ $(document).on('timelineReady', function() {
             }
 
             level = Math.abs(Math.round(Math.log(100 / scale) / Math.log(granularity)));
-            timeWindow = Math.abs(Math.pow(granularity, level)) / 1.75;
+            timeWindow = Math.abs(Math.pow(granularity, level)) / 1.2;
         }
 
         // clear the cache when and re-generate groups the data when needed.
@@ -137,7 +137,7 @@ $(document).on('timelineReady', function() {
                         const clusterItems = clusterItemsArray[i];
                         const minCenter = clusterItems[0].center;
                         const maxCenter = clusterItems[clusterItems.length - 1].center;
-                        if (maxCenter - minCenter > 2 * timeWindow) {
+                        if (maxCenter - minCenter > 2.5 * timeWindow) {
                             let j = 0;
                             let newClusterItems = [];
                             while (j < clusterItems.length) {

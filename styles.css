@@ -25,14 +25,20 @@ h1 {
     line-height: 20px;
 }
 
-.btn-twitter {
+#twitter-button {
     background-color: rgb(29, 155, 240);
     border-radius: 100px;
     border: none;
+    display: inline-block;
     padding: 5px 15px;
     margin-top: 15px;
     font-weight: bold;
     color: white;
+}
+
+#twitter-button:hover {
+    background-color: rgb(26, 140, 216);
+    font-decoration: none !important;
 }
 
 div.outer {
