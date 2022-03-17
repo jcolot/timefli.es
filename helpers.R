@@ -26,55 +26,54 @@ connect_to_tweet_stream <- function() {
     "https://api.twitter.com/2/tweets/search/stream?tweet.fields=author_id,created_at&expansions=geo.place_id&place.fields=contained_within,country,country_code,full_name,geo,id,name,place_type"
   con <- curl(url = url, handle = h)
   
-  
-  tryCatch({
-    stream_in(
-      con,
-      verbose = T,
-      handler = function(tweet) {
-        if (length(tweet)) {
-          try({
-            id  <- tweet$data$id;
-            author_id <- tweet$data$author_id;
-            tweet_text <- tweet$data$text;
-            
-            if (!is.null(tweet_text)) {
-              location <-
-                str_extract(tweet_text, "[0-9]*\\.[0-9]*,[0-9]*\\.[0-9]*");
-            }
-            # only save geotagged tweets (has includes places)
-            if ("includes" %in% colnames(tweet))
-            {
-              url <- paste0('https://twitter.com/', author_id, '/status/', id);
-              embed_code <- get_tweet_embed_code(url);
-              tweet$data$embed_code <- embed_code;
-              insert_tweet_in_db(tweet);
-            } else if (!is.null(location) & !is.na(location)) {
-              url <- paste0('https://twitter.com/', author_id, '/status/', id);
-              embed_code <- get_tweet_embed_code(url);
-              tweet$data$embed_code <- embed_code;
-              tweet$data$location <- location;
-              insert_tweet_in_db(tweet);
-            }
-          })
-        }
-      },
-      pagesize = 1
-    )
-  }, error = function(cond) {
-    print(cond)
-    
-    if (grepl('429', cond$message)) {
+  while(T) {
+    tryCatch({
+      
+      stream_in(
+        con,
+        verbose = T,
+        handler = function(tweet) {
+          if (length(tweet)) {
+            try({
+              id  <- tweet$data$id;
+              author_id <- tweet$data$author_id;
+              tweet_text <- tweet$data$text;
+              
+              if (!is.null(tweet_text)) {
+                location <-
+                  str_extract(tweet_text, "[0-9]*\\.[0-9]*,[0-9]*\\.[0-9]*");
+              }
+              # only save geotagged tweets (has includes places)
+              if ("includes" %in% colnames(tweet))
+              {
+                url <- paste0('https://twitter.com/', author_id, '/status/', id);
+                embed_code <- get_tweet_embed_code(url);
+                tweet$data$embed_code <- embed_code;
+                insert_tweet_in_db(tweet);
+              } else if (!is.null(location) & !is.na(location)) {
+                url <- paste0('https://twitter.com/', author_id, '/status/', id);
+                embed_code <- get_tweet_embed_code(url);
+                tweet$data$embed_code <- embed_code;
+                tweet$data$location <- location;
+                insert_tweet_in_db(tweet);
+              }
+            })
+          }
+        },
+        pagesize = 1
+      )
+    }, error = function(cond) {
       print(cond)
       
-      Sys.sleep(500)
-      
-    }
-    Sys.sleep(10)
-    
-    connect_to_tweet_stream()
-    
-  })
+      if (grepl('429', cond$message)) {
+        print(cond)
+        
+        Sys.sleep(500);
+      }
+      Sys.sleep(10);
+      connect_to_tweet_stream()
+    })
+  }
 }
 
 insert_tweet_in_db <- function(tweet) {
