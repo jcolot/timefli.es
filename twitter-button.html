@@ -1,20 +1,32 @@
+<div>
+    <a id="twitter-button">Tweet</a>
+</div>
+
 <script>
 function getLocation() {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(twitterIntent, function() {
-        alert("You need to allow access to geolocation to use this button.");
+    navigator.geolocation.getCurrentPosition(setTwitterIntent, function() {
+        const twitterButton = document.getElementById('twitter-button');    
+        twitterButton.addEventListener('click', function() {
+            alert("You need to allow access to geolocation to use this button.");
+        });
     });
   } else {
-    alert("Geolocation is not supported by this browser.");
+    const twitterButton = document.getElementById('twitter-button');    
+    twitterButton.addEventListener('click', function() {
+        alert("Geolocation is not supported by this browser.");
+    });
   }
 }
 
-function twitterIntent(position) {
+function setTwitterIntent(position) {
     const latLng = position.coords.latitude + '%2C' + position.coords.longitude;
     const url = "https://twitter.com/intent/tweet?text=%40timefli_es%0aTwitted%20from%20" + latLng;
-    window.open(url, '_blank');
+    const twitterButton = document.getElementById('twitter-button');    
+    twitterButton.setAttribute('href', url);
+    twttr.widgets.load();
 }
+
+setInterval(getLocation(), 5000);
 </script>
-<div>
-    <button class="btn-twitter" onclick="getLocation()">Tweet</button>
-</div>
+
