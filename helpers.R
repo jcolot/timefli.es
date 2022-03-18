@@ -41,7 +41,7 @@ connect_to_tweet_stream <- function() {
               
               if (!is.null(tweet_text)) {
                 location <-
-                  str_extract(tweet_text, "[0-9]*\\.[0-9]*,[0-9]*\\.[0-9]*");
+                  str_extract(tweet_text, "-?[0-9]{1,3}\\.[0-9]*,-?[0-9]{1,3}\\.[0-9]*");
               }
               # only save geotagged tweets (has includes places)
               if ("includes" %in% colnames(tweet))
