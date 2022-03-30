@@ -88,7 +88,7 @@ server <- function(input, output, session) {
   tweets <- get_tweets_from_db()
   
   output$map <- renderLeaflet({
-    leaflet(data(), options = leafletOptions(zoomControl = FALSE)) %>%
+    leaflet(data(), options = leafletOptions(zoomControl = FALSE, minZoom = 3)) %>%
       addProviderTiles("OpenStreetMap.Mapnik") %>%
       addMarkers(
         lng = ~ lng,
@@ -96,7 +96,8 @@ server <- function(input, output, session) {
         popup = ~ embed_code,
         icon = twitterIcon,
         group = ~ id,
-        clusterOptions = markerClusterOptions()
+        clusterOptions = markerClusterOptions(),
+        clusterId = "twitter-markers"
       ) %>%
       
       htmlwidgets::onRender(

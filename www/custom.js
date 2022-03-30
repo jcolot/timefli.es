@@ -178,4 +178,45 @@ $(document).on('timelineReady', function() {
         this.cache[level] = clusters;
         return clusters;
     }
+
+    const syncTimelineAndMap = function(map, timeline, clusterId) {
+
+        if (!map.hiddenLayers) {
+            map.hiddenLayers = [];
+        }
+    
+        const visibleItemIds = timeline.getVisibleItems();
+        const visibleClusters = timeline.itemSet.clusters.filter(cluster => visibleItemIds.includes(cluster.id));
+        const visibleClusteredItemIds = visibleClusters.map(cluster => cluster.data.items.map(item => item.id)).flat();
+        visibleItemIds.push(...visibleClusteredItemIds);
+    
+    
+        const clusterGroup = map.layerManager.getLayer("cluster", clusterId);
+        const mapClusters = [];
+        const mapSimpleMarkers = [];
+        map.eachLayer(function(layer) {if(layer.options.pane == 'markerPane' && layer.getChildCount) mapClusters.push(layer)});
+        map.eachLayer(function(layer) {if(layer.options.pane == 'markerPane' && !layer.getChildCount) mapSimpleMarkers.push(layer)});
+    
+        const mapClusteredMarkers = mapClusters.map(mapCluster => mapCluster.getAllChildMarkers()).flat();
+        const hiddenClusteredMarkers = mapClusteredMarkers.filter(marker => ! visibleItemIds.includes(marker.options.group));
+        const hiddenSimpleMarkers = mapSimpleMarkers.filter(marker => ! visibleItemIds.includes(marker.options.group));
+    
+        hiddenClusteredMarkers.forEach(function(marker) {
+            clusterGroup.removeLayer(marker);
+            map.hiddenLayers.push(marker);
+        });
+    
+        hiddenSimpleMarkers.forEach(function(marker) {
+            map.removeLayer(marker);
+            map.hiddenLayers.push(marker);
+        });
+    
+        const visibleMarkers = map.hiddenLayers.filter(marker => visibleItemIds.includes(marker.options.group));
+        visibleMarkers.forEach(function(marker) {
+            map.addLayer(marker);
+            map.hiddenLayers.filter(layer => layer != marker);
+        });
+    }
+
+    timevis.timeline.on('rangechanged', function() {syncTimelineAndMap(map, timevis.timeline, "twitter-markers")});
 });
